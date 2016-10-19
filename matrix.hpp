@@ -104,6 +104,111 @@ public:
   }
 
 
+public:
+  //------------------------------------------
+  //
+  //  Arithmetic assignment operator
+  //
+  //------------------------------------------
+  constexpr Matrix& operator +=(const Matrix& other) & {
+    for (int iRow = 0; iRow < N; iRow++) {
+      for (int iColumn = 0; iColumn < N; iColumn++) {
+        elements_[iRow][iColumn] += other.elements_[iRow][iColumn];
+      }
+    }
+    return *this;
+  }
+
+  constexpr Matrix& operator -=(const Matrix& other) & {
+    for (int iRow = 0; iRow < N; iRow++) {
+      for (int iColumn = 0; iColumn < N; iColumn++) {
+        elements_[iRow][iColumn] -= other.elements_[iRow][iColumn];
+      }
+    }
+    return *this;
+  }
+
+  constexpr Matrix& operator *=(const T& a) & {
+    for (int iRow = 0; iRow < N; iRow++) {
+      for (int iColumn = 0; iColumn < N; iColumn++) {
+        elements_[iRow][iColumn] *= a;
+      }
+    }
+    return *this;
+  }
+
+  constexpr Matrix& operator *=(const Matrix& other) & {
+    Matrix tmp = *this * other;
+    *this = tmp;
+    return *this;
+  }
+
+  constexpr Matrix&& operator +=(const Matrix& other) && = delete;
+  constexpr Matrix&& operator -=(const Matrix& other) && = delete;
+  constexpr Matrix&& operator *=(const T& a) && = delete;
+  constexpr Matrix&& operator *=(const Matrix& other) && = delete;
+
+
+public:
+  //------------------------------------------
+  //
+  //  Arithmetic binary operator
+  //
+  //------------------------------------------
+  friend constexpr Matrix operator +(const Matrix& lhs, const Matrix& rhs) {
+    Matrix ret(lhs);
+    return ret += rhs;
+  }
+
+  friend constexpr Matrix operator -(const Matrix& lhs, const Matrix& rhs) {
+    Matrix ret(lhs);
+    return ret -= rhs;
+  }
+
+  friend constexpr Matrix operator *(const Matrix& lhs, const T& rhs) {
+    Matrix ret(lhs);
+    return ret *= rhs;
+  }
+
+  friend constexpr Matrix operator *(const T& lhs, const Matrix& rhs) {
+    return rhs *= lhs;
+  }
+
+  // constexpr にするとgcc5.3のバグにより、コンパイルできない。
+  friend Matrix operator *(const Matrix& lhs, const Matrix& rhs) {
+    Matrix ret;
+    for (int iRow = 0; iRow < N; iRow++) {
+      for (int iColumn = 0; iColumn < N; iColumn++) {
+        for (int i = 0; i < N; i++) {
+          ret.elements_[iRow][iColumn] += lhs.elements_[iRow][i] * rhs.elements_[i][iColumn];
+        }
+      }
+    }
+    return ret;
+  }
+
+
+public:
+  //------------------------------------------
+  //
+  //  Logical operator
+  //
+  //------------------------------------------
+  friend constexpr bool operator ==(const Matrix& lhs, const Matrix& rhs) {
+    for (int iRow = 0; iRow < N; iRow++) {
+      for (int iColumn = 0; iColumn < N; iColumn++) {
+        if (lhs.elements_[iRow][iColumn] != rhs.elements_[iRow][iColumn])
+          return false;
+      }
+    }
+    return true;
+  }
+
+  friend constexpr bool operator !=(const Matrix& lhs, const Matrix& rhs) {
+    return !(lhs == rhs);
+  }
+
+
 protected:
   T elements_[N][N] = {};
 };  // namespace Matrix
