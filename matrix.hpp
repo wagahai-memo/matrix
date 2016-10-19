@@ -68,6 +68,42 @@ public:
   constexpr Matrix&& operator =(Matrix&&) && noexcept = delete;
 
 
+public:
+  //------------------------------------------
+  //
+  //  Element access
+  //
+  //------------------------------------------
+  constexpr T& operator ()(int row, int column) {
+    return elements_[row][column];
+  }
+
+  constexpr const T& operator ()(int row, int column) const {
+    return elements_[row][column];
+  }
+
+
+public:
+  //------------------------------------------
+  //
+  //  Arithmetic unary operator
+  //
+  //------------------------------------------
+  constexpr Matrix operator +() const {
+    return Matrix(*this);
+  }
+
+  constexpr Matrix operator -() const {
+    Matrix ret;
+    for (int iRow = 0; iRow < N; iRow++) {
+      for (int iColumn = 0; iColumn < N; iColumn++) {
+        ret.elements_[iRow][iColumn] = -elements_[iRow][iColumn];
+      }
+    }
+    return ret;
+  }
+
+
 protected:
   T elements_[N][N] = {};
 };  // namespace Matrix
